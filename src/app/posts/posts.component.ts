@@ -3,7 +3,6 @@ import { PostService } from '../services/post.service';
 import { AppError } from '../common/app-error';
 import { NotFoundError } from '../common/not-found-error';
 import { BadInput } from '../common/bad-input';
-import { AppErrorHandler } from '../common/app-error-handler';
 
 @Component({
   selector: 'app-posts',
@@ -25,14 +24,18 @@ export class PostsComponent implements OnInit {
 
   createPost(input: HTMLInputElement) {
     const post = { title: input.value };
+    this.posts.splice(0, 0, post);
+
+    input.value = '';
 
     this.service.create(post)
       .subscribe(
         newPost => {
           post['id'] = newPost.id;
-          this.posts.splice(0, 0, post);
         },
         (error: AppError) => {
+          this.posts.splice(0, 1);
+
           if (error instanceof BadInput) {
             // this.form.setErrors(error.originalError);
           } else {
@@ -59,14 +62,17 @@ export class PostsComponent implements OnInit {
   }
 
   deletePost(post) {
+    const index = this.posts.indexOf(post);
+    this.posts.splice(index, 1);
+
     this.service.delete(post)
       .subscribe(
         () => {
-          const index = this.posts.indexOf(post);
-          this.posts.splice(index, 1);
           console.log('deletion success');
         },
         (error: AppError) => {
+          this.posts.splice(index, 0, post);
+
           if (error instanceof NotFoundError) {
             alert('This post has already been deleted.');
           } else {
