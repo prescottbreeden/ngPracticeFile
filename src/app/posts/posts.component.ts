@@ -19,9 +19,7 @@ export class PostsComponent implements OnInit {
   ngOnInit() {
     this.service.getAll()
       .subscribe(
-        response => {
-          this.posts = response.json();
-        }
+        response => this.posts = response
       );
   }
 
@@ -30,8 +28,8 @@ export class PostsComponent implements OnInit {
 
     this.service.create(post)
       .subscribe(
-        response => {
-          post['id'] = response.json().id;
+        newPost => {
+          post['id'] = newPost.id;
           this.posts.splice(0, 0, post);
         },
         (error: AppError) => {
@@ -47,8 +45,15 @@ export class PostsComponent implements OnInit {
   updatePost(post) {
     this.service.update(post)
       .subscribe(
-        response => {
-          console.log('success', response.json());
+        updatedPost => {
+          console.log('success', updatedPost);
+        },
+        (error: AppError) => {
+          if (error instanceof NotFoundError) {
+            alert('This post has already been deleted.');
+          } else {
+            throw error;
+          }
         }
       );
   }
@@ -56,10 +61,10 @@ export class PostsComponent implements OnInit {
   deletePost(post) {
     this.service.delete(post)
       .subscribe(
-        response => {
+        () => {
           const index = this.posts.indexOf(post);
           this.posts.splice(index, 1);
-          console.log('success', response.json());
+          console.log('deletion success');
         },
         (error: AppError) => {
           if (error instanceof NotFoundError) {
