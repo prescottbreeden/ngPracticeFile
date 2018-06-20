@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { PostService } from '../services/post.service';
 import { AppError } from '../common/app-error';
 import { NotFoundError } from '../common/not-found-error';
+import { BadInput } from '../common/bad-input';
+import { AppErrorHandler } from '../common/app-error-handler';
 
 @Component({
   selector: 'app-posts',
@@ -15,50 +17,44 @@ export class PostsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.service.getPosts()
+    this.service.getAll()
       .subscribe(
         response => {
           this.posts = response.json();
-        },
-        error => {
-          alert('An unexpected error occurred.');
-          console.log(error);
-        });
+        }
+      );
   }
 
   createPost(input: HTMLInputElement) {
     const post = { title: input.value };
 
-    this.service.createPost(post)
+    this.service.create(post)
       .subscribe(
         response => {
           post['id'] = response.json().id;
           this.posts.splice(0, 0, post);
         },
-        (error: Response) => {
-          if (error.status === 400) {
-            // this.form.setErrors(error.json());
+        (error: AppError) => {
+          if (error instanceof BadInput) {
+            // this.form.setErrors(error.originalError);
           } else {
-            alert('An unexpected error occurred');
-            console.log(error);
+            throw error;
           }
-        });
+        }
+      );
   }
 
   updatePost(post) {
-    this.service.updatePost(post)
+    this.service.update(post)
       .subscribe(
         response => {
           console.log('success', response.json());
-        },
-        error => {
-          alert('An unexpected error occurred');
-          console.log(error);
-        });
+        }
+      );
   }
 
   deletePost(post) {
-    this.service.deletePost(post)
+    this.service.delete(post)
       .subscribe(
         response => {
           const index = this.posts.indexOf(post);
@@ -69,10 +65,10 @@ export class PostsComponent implements OnInit {
           if (error instanceof NotFoundError) {
             alert('This post has already been deleted.');
           } else {
-            alert('An unexpected error occurred');
-            console.log(error);
+            throw error;
           }
-        });
+        }
+      );
   }
 
 }
