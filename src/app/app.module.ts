@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { FavoriteComponent } from './favorite/favorite.component';
 import { PanelComponent } from './panel/panel.component';
 import { PostsComponent } from './posts/posts.component';
+import { PostService } from './services/post.service';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { PostsComponent } from './posts/posts.component';
     HttpModule,
     BrowserModule
   ],
-  providers: [],
+  providers: [PostService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
