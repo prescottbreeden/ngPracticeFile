@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpModule, Http } from '@angular/http';
+import { HttpModule } from '@angular/http';
 import { NgModule, ErrorHandler } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { FavoriteComponent } from './favorite/favorite.component';
@@ -18,7 +19,8 @@ import { AppErrorHandler } from './common/app-error-handler';
   ],
   imports: [
     HttpModule,
-    BrowserModule
+    BrowserModule,
+    FormsModule
   ],
   providers: [
     PostService,
